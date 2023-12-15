@@ -5,12 +5,18 @@ class Environment:
     Environment class which specifies how the agent moves through a given maze
     '''
 
-    def __init__(self, **p):
+    def __init__(self, p):
         '''
         Initialise the class instance 
         '''
-
-        self.__dict__.update(**p)
+        
+        self.num_x_states = p["num_x_states"]
+        self.num_y_states = p["num_y_states"]
+        self.num_actions = p["num_actions"]
+        self.goal_state = p["goal_state"]
+        self.reward_at_goal = p["reward_at_goal"]
+        self.blocked_states = p["blocked_states"]
+        self.start_state = p["start_state"]
         self.num_states = self.num_x_states * self.num_y_states
         self._generate_env_model()
 
@@ -24,6 +30,7 @@ class Environment:
 
         self.T = np.zeros((self.num_states, self.num_actions, self.num_states))
         self.R = np.zeros((self.num_states, self.num_actions), dtype=int)
+
 
         for s in range(self.num_states):
             for a in range(self.num_actions):
@@ -104,3 +111,19 @@ class Environment:
         '''
 
         return np.arange(self.num_y_states*self.num_x_states).reshape(self.num_y_states, self.num_x_states)[i][j]
+    
+class Environment_TwoStepAgent:
+    '''
+    Environment class which specifies how the agent moves through a given maze
+    '''
+
+    def __init__(self, p):
+        '''
+        Initialise the class instance 
+        '''
+        self.num_actions = 2
+        self.num_states = 3
+
+        self.start_state = 0
+
+        return None

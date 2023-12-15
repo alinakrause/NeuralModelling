@@ -1,6 +1,23 @@
 import numpy as np
 from scipy import stats # for gaussian noise
 from environment import Environment
+import random
+
+
+
+def allmax(a):
+    if len(a) == 0:
+        return []
+    all_ = [0]
+    max_ = a[0]
+    for i in range(1, len(a)):
+        if a[i] > max_:
+            all_ = [i]
+            max_ = a[i]
+        elif a[i] == max_:
+            all_.append(i)
+    return all_
+
 
 class DynaAgent(Environment):
 
@@ -20,7 +37,7 @@ class DynaAgent(Environment):
 
         return None
 
-    def init_env(self, **env_config):
+    def init_env(self, env_config):
 
         '''
         Initialise the environment
@@ -28,7 +45,7 @@ class DynaAgent(Environment):
             **env_config -- dictionary with environment parameters
         '''
 
-        Environment.__init__(self, **env_config)
+        Environment.__init__(self, env_config)
 
         return None
 
@@ -87,6 +104,7 @@ class DynaAgent(Environment):
         '''
 
         # complete the code
+        self.experience_buffer[s*self.num_actions+a,:] = np.asarray((s,a,r,s1))
 
         return None
 
@@ -102,6 +120,11 @@ class DynaAgent(Environment):
             bonus -- True / False whether to use exploration bonus or not
         '''
 
+        e = self.Q[s1,np.argmax(self.Q[s1,:])]
+
+        self.Q[s,a] = self.Q[s,a] + self.alpha*(r + (self.epsilon*bonus*np.sqrt(self.action_count[s,a])) + self.gamma * e - self.Q[s,a])
+
+        
         # complete the code
 
         return None
@@ -115,6 +138,12 @@ class DynaAgent(Environment):
             s  -- initial state
             a  -- chosen action
         '''
+
+        # time since last visited
+        # everything +1 ago
+        self.action_count = self.action_count + 1
+        # last visited 0 timesteps ago
+        self.action_count[s,a] = 0
 
         # complete the code
 
@@ -135,6 +164,8 @@ class DynaAgent(Environment):
 
         return None
 
+
+
     def _policy(self, s):
 
         '''
@@ -147,7 +178,12 @@ class DynaAgent(Environment):
 
         # complete the code
 
-        return None
+        q_values = self.Q[s,:] + self.epsilon*np.sqrt(self.action_count[s,:])
+
+        a = random.choice(allmax(q_values))
+
+
+        return a
 
     def _plan(self, num_planning_updates):
 
@@ -158,6 +194,14 @@ class DynaAgent(Environment):
         '''
 
         # complete the code
+        for i in range(num_planning_updates):
+            #num states
+            rows = self.experience_buffer.shape[0]
+            # pick a state
+            select_ind = np.random.randint(rows)
+            s,a,r,s1 = self.experience_buffer[select_ind]
+            
+            self._update_qvals(s, a, r, s1, bonus=True)
 
         return None
 
