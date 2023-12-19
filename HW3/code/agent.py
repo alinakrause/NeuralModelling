@@ -178,18 +178,21 @@ class DynaAgent(Environment):
         '''
 
         # complete the code
-
-
         q_values = self.Q[s,:] + self.epsilon*np.sqrt(self.action_count[s,:])
         q_values = random.choice(allmax(q_values))
 
         if self.greedy:
             epsilon_greedy = 0.1
-            if np.random.random() < epsilon_greedy:
+            p = np.random.random()
+            p = np.random.random() < epsilon_greedy
+            if p:
                 q_values = np.random.randint(0,4)
 
 
         return q_values
+    
+
+
 
     def _plan(self, num_planning_updates):
 
