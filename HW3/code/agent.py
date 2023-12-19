@@ -396,7 +396,7 @@ class TwoStepAgent(Environment_TwoStepAgent):
             a     -- chosen action
         '''
 
-        if s != 0:
+        if not s == 0:
             self.QMB[s * self.num_actions + a] = self.QTD[s * self.num_actions + a]
             return None
 
@@ -525,10 +525,8 @@ class TwoStepAgent(Environment_TwoStepAgent):
 
         for _ in range(num_trials):
             s1 = self.start_state
-            # choose action
-            a1  = self._policy(s1)
 
-            # get new state
+            a1  = self._policy(s1)
             r1=0
             s2 = self.get_next_state(s1,a1)
 
@@ -536,16 +534,12 @@ class TwoStepAgent(Environment_TwoStepAgent):
                 self.transition_count_b+=1
             elif (s1==2 and a1==0) or (s1==1 and a1==1):
                 self.transition_count_c+=1
-
             self.last_a = a1
-
-            # receive reward
             a2 = self._policy(s2)
             self._Q_td(s1, a1, r1, s2,a2,False)
             p = self.rewards[s2]
             r2 = np.random.choice((0,1), p=(1-p, p))
 
-            # learning
             self._Q_td(s2, a2, r2, _,_,False)
             self._Q_td(s1, a1, r2, s2,a2,True)
 
