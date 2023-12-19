@@ -21,7 +21,7 @@ def allmax(a):
 
 class DynaAgent(Environment):
 
-    def __init__(self, alpha, gamma, epsilon):
+    def __init__(self, alpha, gamma, epsilon,greedy):
 
         '''
         Initialise the agent class instance
@@ -34,6 +34,7 @@ class DynaAgent(Environment):
         self.alpha   = alpha
         self.gamma   = gamma 
         self.epsilon = epsilon
+        self.greedy = greedy
 
         return None
 
@@ -178,12 +179,17 @@ class DynaAgent(Environment):
 
         # complete the code
 
+
         q_values = self.Q[s,:] + self.epsilon*np.sqrt(self.action_count[s,:])
+        q_values = random.choice(allmax(q_values))
 
-        a = random.choice(allmax(q_values))
+        if self.greedy:
+            epsilon_greedy = 0.1
+            if np.random.random() < epsilon_greedy:
+                q_values = np.random.randint(0,4)
 
 
-        return a
+        return q_values
 
     def _plan(self, num_planning_updates):
 
