@@ -19,7 +19,7 @@ PERTUBATION_ANGLE= 30
 TIME_LIMIT = 1000 # time limit in ms
 
 trial_count = 0
-DESIGN_CHANGE = [40,80,120,160]
+DESIGN_CHANGE = np.asarray([40,80,120,160])
 GRAD_START = DESIGN_CHANGE[0]
 # Colors
 WHITE = (255, 255, 255)
@@ -167,11 +167,13 @@ while running:
         start_time = 0  # Reset start_time after hitting the target
 
         # CALCULATE AND SAVE ERRORS between target and circle end position for a hit
-        error_angle = 0
+        error_angle = 0.0
         font = pygame.font.Font(None, 36) 
         score_text = font.render("here:", True, WHITE) 
         screen.blit(score_text, (1000, 200))
         #error_angle = float("NaN")
+        if (move_faster):
+            error_angle = np.nan
         error_angles.append(error_angle)
 
     #miss if player leaves the target_radius + 1% tolerance
@@ -188,9 +190,9 @@ while running:
         if error_angle > np.pi:
            error_angle =  (2*np.pi) - error_angle
         error_angle = np.rad2deg(error_angle)
-        font = pygame.font.Font(None, 36)
-        score_text = font.render(f"Miss - Error angle: {math.degrees(error_angle)}", True, WHITE)
-        screen.blit(score_text, (1000, 200))
+        error_angle = np.abs(error_angle)
+        if (move_faster):
+            error_angle = np.nan
         error_angles.append(error_angle)
 
     # Check if player moved to the center and generate new target
@@ -243,16 +245,24 @@ while running:
 
 # Quit Pygame
 pygame.quit()
-
+pertubations = ['gradual Pertubation', 'no Pertubation', 'sudden Pertubation', 'no Pertubation']
 print(error_angles)
 ## TASK 2, CALCULATE, PLOT AND SAVE ERRORS from error_angles
+error_angles = np.array(error_angles)
 att_nr=np.linspace(0,len(error_angles),len(error_angles))
-plt.plot(att_nr,error_angles, linestyle = 'dashed')
+# points are connected between nan values
+mask = np.isfinite(error_angles.astype(np.double))
+plt.plot(att_nr[mask],error_angles[mask], linestyle = 'dashed')
 plt.scatter(att_nr,error_angles)
-for change in DESIGN_CHANGE:
-    plt.axvline(x=change, color='red')
+plt.xlabel('#Attempt')
+plt.ylabel('Error Angle (degrees)')
+plt.xlim(0,200)
+plt.ylim(0, np.max(error_angles+5))
+for change in range(len(DESIGN_CHANGE)):
+    plt.axvline(x=DESIGN_CHANGE[change], color='red')
+    plt.text(DESIGN_CHANGE[change], max(error_angles), pertubations[change], color = 'red',rotation=0, va='top')
 
 
+plt.savefig('reaching_task_graph.png')
 plt.show()
-
 sys.exit()
