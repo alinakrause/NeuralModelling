@@ -187,6 +187,7 @@ while running:
         targetY = HEIGHT / 2 + TARGET_RADIUS
 
         error_angle = calculate_angle(START_POSITION, circle_pos) + np.pi/2
+    
         if error_angle > np.pi:
            error_angle =  (2*np.pi) - error_angle
         error_angle = np.rad2deg(error_angle)
@@ -194,6 +195,7 @@ while running:
         if (move_faster):
             error_angle = np.nan
         error_angles.append(error_angle)
+
 
     # Check if player moved to the center and generate new target
     if not new_target and at_start_position_and_generate_target(mouse_pos):
@@ -245,8 +247,9 @@ while running:
 
 # Quit Pygame
 pygame.quit()
-pertubations = ['gradual Pertubation', 'no Pertubation', 'sudden Pertubation', 'no Pertubation']
+pertubations = [' gradual \n Pertubation', ' no \n  Pertubation', ' sudden \n Pertubation', ' no \n Pertubation']
 print(error_angles)
+
 ## TASK 2, CALCULATE, PLOT AND SAVE ERRORS from error_angles
 error_angles = np.array(error_angles)
 att_nr=np.linspace(0,len(error_angles),len(error_angles))
@@ -257,10 +260,10 @@ plt.scatter(att_nr,error_angles)
 plt.xlabel('#Attempt')
 plt.ylabel('Error Angle (degrees)')
 plt.xlim(0,200)
-plt.ylim(0, np.max(error_angles+5))
+plt.ylim(0, np.nanmax(error_angles+5))
 for change in range(len(DESIGN_CHANGE)):
     plt.axvline(x=DESIGN_CHANGE[change], color='red')
-    plt.text(DESIGN_CHANGE[change], max(error_angles), pertubations[change], color = 'red',rotation=0, va='top')
+    plt.text(DESIGN_CHANGE[change], np.nanmax(error_angles), pertubations[change], color = 'red',rotation=0, va='top')
 
 
 plt.savefig('reaching_task_graph.png')
