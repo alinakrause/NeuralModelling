@@ -12,14 +12,14 @@ CIRCLE_SIZE = 20
 TARGET_SIZE = CIRCLE_SIZE
 TARGET_RADIUS = 300
 MASK_RADIUS = 0.75 * TARGET_RADIUS
-ATTEMPTS_LIMIT = 80#200
+ATTEMPTS_LIMIT = 280#200
 START_POSITION = (WIDTH // 2, HEIGHT // 2)
 START_ANGLE = 0
 PERTUBATION_ANGLE= 30
 TIME_LIMIT = 1000 # time limit in ms
 
 trial_count = 0
-DESIGN_CHANGE = np.asarray([40,80,120,160])
+DESIGN_CHANGE = np.asarray([40,80,120,160,200,240])
 GRAD_START = DESIGN_CHANGE[0]
 # Colors
 WHITE = (255, 255, 255)
@@ -109,27 +109,23 @@ while running:
     # Design experiment
     if attempts == 1:
         pertubation_mode = False
-    elif attempts == 100: #GRAD_START: #40
+    elif attempts == 40: #GRAD_START: #40
         pertubation_mode = True
         pertubation_type = 'gradual' 
-    elif attempts == 100:  #80
+    elif attempts == 80:  #80
         pertubation_mode = False
-    elif attempts == 100:  #120
+    elif attempts == 120:  #120
         pertubation_mode = True    
         pertubation_type = 'sudden'  
-    elif attempts == 100:  #80
+    elif attempts == 160:  #80
         pertubation_mode = False
-    elif attempts == 5:  #160
+    elif attempts == 200:  #160
         pertubation_mode = False
         shift_target = True
         start_target=math.radians(-30)
-    elif attempts == 60:  
-        pertubation_mode = False
+    elif attempts == 240:  
+        pertubation_mode = 'gradual'
         start_target=math.radians(START_ANGLE)
-    elif attempts == 70:  #160
-        pertubation_mode = 'sudden'
-    elif attempts == 80:  #160
-        pertubation_mode = False
     elif attempts >= ATTEMPTS_LIMIT:
         running = False        
 
@@ -265,7 +261,7 @@ while running:
 
 # Quit Pygame
 pygame.quit()
-pertubations = [' gradual \n Pertubation', ' no \n  Pertubation', ' sudden \n Pertubation', ' no \n Pertubation']
+pertubations = [' gradual \n Pertubation', ' no \n Pertubation', ' sudden \n Pertubation', ' no \n Pertubation', ' shift', ' gradual \n Pertubation']
 print(error_angles)
 
 ## TASK 2, CALCULATE, PLOT AND SAVE ERRORS from error_angles
@@ -273,11 +269,12 @@ error_angles = np.array(error_angles)
 att_nr=np.linspace(0,len(error_angles),len(error_angles))
 # points are connected between nan values
 mask = np.isfinite(error_angles.astype(np.double))
+plt.figure(figsize=(16,8))
 plt.plot(att_nr[mask],error_angles[mask], linestyle = 'dashed')
 plt.scatter(att_nr,error_angles)
 plt.xlabel('#Attempt')
 plt.ylabel('Error Angle (degrees)')
-plt.xlim(0,200)
+plt.xlim(0,280)
 plt.ylim(0, np.nanmax(error_angles+5))
 for change in range(len(DESIGN_CHANGE)):
     plt.axvline(x=DESIGN_CHANGE[change], color='red')
