@@ -12,7 +12,7 @@ CIRCLE_SIZE = 20
 TARGET_SIZE = CIRCLE_SIZE
 TARGET_RADIUS = 300
 MASK_RADIUS = 0.75 * TARGET_RADIUS
-ATTEMPTS_LIMIT = 16#200
+ATTEMPTS_LIMIT = 80#200
 START_POSITION = (WIDTH // 2, HEIGHT // 2)
 START_ANGLE = 0
 PERTUBATION_ANGLE= 30
@@ -41,7 +41,7 @@ score = 0
 attempts = 0
 new_target = None
 start_time = 0
-
+shift_target = False
 new_target = None
 start_target=math.radians(START_ANGLE)
 move_faster = False 
@@ -109,15 +109,26 @@ while running:
     # Design experiment
     if attempts == 1:
         pertubation_mode = False
-    elif attempts == GRAD_START: #40
+    elif attempts == 100: #GRAD_START: #40
         pertubation_mode = True
         pertubation_type = 'gradual' 
-    elif attempts == 8:  #80
+    elif attempts == 100:  #80
         pertubation_mode = False
-    elif attempts == 12:  #120
+    elif attempts == 100:  #120
         pertubation_mode = True    
-        pertubation_type = 'sudden'         
-    elif attempts == 16:  #160
+        pertubation_type = 'sudden'  
+    elif attempts == 100:  #80
+        pertubation_mode = False
+    elif attempts == 5:  #160
+        pertubation_mode = False
+        shift_target = True
+        start_target=math.radians(-30)
+    elif attempts == 60:  
+        pertubation_mode = False
+        start_target=math.radians(START_ANGLE)
+    elif attempts == 70:  #160
+        pertubation_mode = 'sudden'
+    elif attempts == 80:  #160
         pertubation_mode = False
     elif attempts >= ATTEMPTS_LIMIT:
         running = False        
@@ -132,7 +143,7 @@ while running:
     deltay = mouse_pos[1] - START_POSITION[1]
     distance = math.hypot(deltax, deltay)
 
-    a = attempts-GRAD_START
+    a = attempts-10#GRAD_START
     
     if pertubation_mode:
         # TASK1: CALCULATE perturbed_mouse_pos 
@@ -186,7 +197,14 @@ while running:
         targetX = WIDTH / 2 
         targetY = HEIGHT / 2 + TARGET_RADIUS
 
+        target_pos = (targetX, targetY)
+
         error_angle = calculate_angle(START_POSITION, circle_pos) + np.pi/2
+
+
+        if (shift_target):
+            error_angle = error_angle + np.deg2rad(30)
+    
     
         if error_angle > np.pi:
            error_angle =  (2*np.pi) - error_angle
@@ -263,7 +281,7 @@ plt.xlim(0,200)
 plt.ylim(0, np.nanmax(error_angles+5))
 for change in range(len(DESIGN_CHANGE)):
     plt.axvline(x=DESIGN_CHANGE[change], color='red')
-    plt.text(DESIGN_CHANGE[change], np.nanmax(error_angles), pertubations[change], color = 'red',rotation=0, va='top')
+    plt.text(DESIGN_CHANGE[change], np.nanmax(error_angles)+4, pertubations[change], color = 'red',rotation=0, va='top')
 
 
 plt.savefig('reaching_task_graph.png')
