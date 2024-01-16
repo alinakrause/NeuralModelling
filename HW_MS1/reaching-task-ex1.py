@@ -109,6 +109,8 @@ while running:
     # Design experiment
     if attempts == 1:
         pertubation_mode = False
+        shift_target = True
+        start_target=math.radians(30)
     elif attempts == 40: #GRAD_START: #40
         pertubation_mode = True
         pertubation_type = 'gradual' 
@@ -122,7 +124,7 @@ while running:
     elif attempts == 200:  #160
         pertubation_mode = False
         shift_target = True
-        start_target=math.radians(-30)
+        start_target=math.radians(30)
     elif attempts == 240:  
         pertubation_mode = 'gradual'
         start_target=math.radians(START_ANGLE)
@@ -199,7 +201,7 @@ while running:
 
 
         if (shift_target):
-            error_angle = error_angle + np.deg2rad(30)
+            error_angle = error_angle - np.deg2rad(30)
     
     
         if error_angle > np.pi:
