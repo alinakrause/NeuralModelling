@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Game parameters
-SCREEN_X, SCREEN_Y = 2560,1600 #3024, 1964 # your screen resolution
+SCREEN_X, SCREEN_Y = 3024, 1964 #2560,1600 # your screen resolution
 WIDTH, HEIGHT = SCREEN_X // 1  , SCREEN_Y // 1#WIDTH, HEIGHT = SCREEN_X // 1.5  , SCREEN_Y // 1.5 # be aware of monitor scaling on windows (150%)
 CIRCLE_SIZE = 20
 TARGET_SIZE = CIRCLE_SIZE
@@ -22,12 +22,12 @@ TIME_LIMIT = 1000 # time limit in ms
 #GRADUAL_PERT_ATT_NO = 10
 #SUDDEN_PERT_ATT_NO = 80
 
-#timestamps_changes = [1,40,80,120,160,200,240,280,320,360]
-timestamps_changes = [1,5,10,15,20,25,30,35,40,45]  # WHEN CHANGING THIS ALSO CHANGE FULL ARRAY
+timestamps_changes = [1,40,80,120,160,200,240,280,320,360]
+#timestamps_changes = [1,5,10,15,20,25,30,35,40,45]  # WHEN CHANGING THIS ALSO CHANGE FULL ARRAY
 
 ATTEMPTS_LIMIT = timestamps_changes[len(timestamps_changes)-1]+1
-#timestamps_changes_full = [0,40,80,120,160,200,240,280,320,ATTEMPTS_LIMIT]
-timestamps_changes_full = [0,5,10,15,20,25,30,35,40,ATTEMPTS_LIMIT]
+timestamps_changes_full = [0,40,80,120,160,200,240,280,320,ATTEMPTS_LIMIT]
+#timestamps_changes_full = [0,5,10,15,20,25,30,35,40,ATTEMPTS_LIMIT]
 
 
 # Colors
@@ -53,11 +53,11 @@ start_time = 0
 
 new_target = None
 start_target=math.radians(START_ANGLE)
-move_faster = False 
+move_faster = False
 clock = pygame.time.Clock()
 
 # Initialize game modes
-mask_mode= False
+mask_mode= True
 target_mode = 'fix'  # Mode for angular shift of target: random, fix, dynamic
 pertubation_mode= False
 pertubation_type= 'sudden' # Mode for angular shift of control: random, gradual or sudden
@@ -81,16 +81,14 @@ def calculate_angle(centerX, centerY, targetX, targetY, pointX, pointY):
 
     # dot prod
 
-    product_CP_CT = v_CP[0]*v_CT[0] + v_CP[1]*v_CT[1] 
+    product_CP_CT = v_CP[0]*v_CT[0] + v_CP[1]*v_CT[1]
 
 
-    # anglge
-    angle_rad = math.acos(product_CP_CT/(l_CP*l_CT))
-
-    angle2 = math.asin(product_CP_CT/(l_CP*l_CT))
+    # angle
+    angle = math.acos(product_CP_CT/(l_CP*l_CT))
     
     # in deg
-    angle_deg = math.degrees(angle_rad)
+    angle_deg = math.degrees(angle)
 
     # rotation direction
     cross_product = v_CT[0]*v_CP[1] - v_CT[1]*v_CP[0]
@@ -100,17 +98,13 @@ def calculate_angle(centerX, centerY, targetX, targetY, pointX, pointY):
 
     return angle_deg
 
-
-
-
-
 # Function to generate a new target position
 def generate_target_position():
     if target_mode == 'random':
         angle = random.uniform(0, 2 * math.pi)
 
-    elif target_mode == 'fix':   
-        angle=start_target;  
+    elif target_mode == 'fix':
+        angle=start_target;
 
     new_target_x = WIDTH // 2 + TARGET_RADIUS * math.sin(angle)
     new_target_y = HEIGHT // 2 + TARGET_RADIUS * -math.cos(angle) # zero-angle at the top
@@ -152,30 +146,28 @@ while running:
     if attempts == 1:
         pertubation_mode = False
     elif attempts == timestamps_changes[1]:
-        pertubation_mode = True
-        pertubation_type = 'gradual' 
+       pertubation_mode = True
+       pertubation_type = 'gradual'
     elif attempts == timestamps_changes[2]:
         pertubation_mode = False
     elif attempts == timestamps_changes[3]:
-        pertubation_mode = True    
-        pertubation_type = 'sudden'         
+        pertubation_mode = True
+        pertubation_type = 'sudden'
     elif attempts == timestamps_changes[4]:
         pertubation_mode = False
     elif attempts == timestamps_changes[5]:
-        perturbation_mode = False
+        pertubation_mode = False
         start_target=math.radians(-30)
     elif attempts == timestamps_changes[6]:
-        perturbation_mode = False
+        pertubation_mode = False
         start_target=math.radians(START_ANGLE)
     elif attempts == timestamps_changes[7]:
-        perturbation_mode = True
-        perturbation_mode = True
-        perturbation_type = 'sudden'
-        start_target=math.radians(START_ANGLE)
+        pertubation_mode = True
+        pertubation_type = 'sudden'
     elif attempts == timestamps_changes[8]:
-        perturbation_mode = False
+        pertubation_mode = False
     elif attempts >= ATTEMPTS_LIMIT:
-        running = False        
+        running = False
 
     # Hide the mouse cursor
     pygame.mouse.set_visible(False)
@@ -188,14 +180,11 @@ while running:
     distance = math.hypot(deltax, deltay)
     
     pert_angle = 0
-    circle_pos = pygame.mouse.get_pos()
+
     if pertubation_mode:
-        print('pert',attempts)
-        # TASK1: CALCULATE perturbed_mouse_pos 
+        # TASK1: CALCULATE perturbed_mouse_pos
         if pertubation_type=='sudden':
-            print('here',attempts)
-            pert_angle =perturbation_angle
-            print(pert_angle)
+            pert_angle = perturbation_angle
             
         elif pertubation_type=='gradual':
             k = (attempts - timestamps_changes[1]) // 5 + 1
@@ -205,18 +194,15 @@ while running:
         #score_text = font.render(f"Pert_angle: {math.degrees(pert_angle)}", True, WHITE)
         #screen.blit(score_text, (1000, 200))
 
-        perturbed_mouse_pos = [ 
+        perturbed_mouse_pos = [
             np.cos(pert_angle)*deltax - np.sin(pert_angle)*deltay + START_POSITION[0],
             np.sin(pert_angle)*deltax + np.cos(pert_angle)*deltay + START_POSITION[1]
         ]
-        print(perturbed_mouse_pos == pygame.mouse.get_pos())
             
         circle_pos = perturbed_mouse_pos
-
     
-    #else:
-        
-    print(circle_pos == pygame.mouse.get_pos())
+    else:
+        circle_pos = pygame.mouse.get_pos()
     
     # Check if target is hit or missed
     # hit if circle touches target's center
@@ -233,7 +219,7 @@ while running:
         error_angle = calculate_angle(START_POSITION[0],START_POSITION[1],targetX,targetY,circle_pos[0],circle_pos[1])#np.arcsin((circle_pos[0] - START_POSITION[0])/distance)
         if not move_faster:
             error_angles.append((error_angle))
-        else: 
+        else:
             error_angles.append(np.nan)
 
     #miss if player leaves the target_radius + 1% tolerance
@@ -248,9 +234,6 @@ while running:
         # CALCULATE AND SAVE ERRORS between target and circle end position for a miss
         error_angle = calculate_angle(START_POSITION[0],START_POSITION[1],targetX,targetY,circle_pos[0],circle_pos[1]) #np.arcsin((circle_pos[0] - START_POSITION[0])/distance)
 
-        
-        
-        
         if not move_faster:
             error_angles.append((error_angle))
         else:
@@ -288,7 +271,7 @@ while running:
         pygame.draw.circle(screen, WHITE, circle_pos, CIRCLE_SIZE // 2)
     
     # Draw start position
-    pygame.draw.circle(screen, WHITE, START_POSITION, 5)        
+    pygame.draw.circle(screen, WHITE, START_POSITION, 5)
 
     # Show score
     font = pygame.font.Font(None, 36)
@@ -316,63 +299,38 @@ att_nr=np.linspace(0,len(error_angles),len(error_angles))
 # points are connected between nan values
 mask = np.isfinite(error_angles.astype(np.double))
 
-mv_list = []
+
 timestamps_changes = np.array(timestamps_changes)
 
 error_segments = []
+mean_values = []
+mov_var_list = []
 
-# Loop to create segments
+# Loop to create segments and calculate mean error angle and movement variability
+
 for i in range(len(timestamps_changes) - 1):
+
     start_index = int(timestamps_changes[i])
     end_index = int(timestamps_changes[i + 1])
     segment = error_angles[start_index:end_index]
-    error_segments.append(segment)
+    segment = np.array(segment)
 
-# Convert the list of segments to a list of NumPy arrays
-error_segments = [np.array(segment) for segment in error_segments]
+    mean_value_seg = np.nanmean(segment)
+    mov_var_seg = np.nanstd(segment)
+    
+    error_segments.append(segment)
+    mean_values.append(mean_value_seg)
+    mov_var_list.append(mov_var_seg)
 
 
 for i, segment in enumerate(error_segments):
     print(f"Segment {i + 1}: {segment}")
 
-
-mean_values = []
-
-# Calculate mean for each segment
-for segment in error_segments:
-    mean_value = np.nanmean(segment)
-    mean_values.append(mean_value)
-
-
 for i, mean_value in enumerate(mean_values):
     print(f"Mean value for Segment {i + 1}: {mean_value}")
 
-plt.figure(figsize=(10, 6))
-plt.boxplot(error_segments, positions=range(1, len(error_segments) + 1), labels=[f'Segment {i+1}' for i in range(len(mean_values))])
-plt.xlabel('Segment')
-plt.ylabel('Mean Value')
-plt.title('Boxplot of Mean Values for Each Segment')
-plt.ylim(0, ATTEMPTS_LIMIT)  
-plt.show()
-
-
-if 1 == 0:
-
-    
-    for ts in range(len(timestamps_changes)-1):
-        start_index = int(timestamps_changes[ts])
-        end_index = int(timestamps_changes[ts+1])
-        
-        errors_seg = error_angles[start_index:end_index]
-        print(errors_seg)
-        
-        mask_seg = mask[start_index:end_index]
-        print(mask_seg)
-        
-        mv_seg = np.std(errors_seg[mask_seg])
-        mv_list.append(mv_seg)
-
-
+for i, mov_var in enumerate(mov_var_list):
+    print(f"Movement Variability for Segment {i + 1}: {mov_var}")
 
 
 plt.figure(figsize=(16,8))
@@ -387,52 +345,13 @@ for change in range(1, len(timestamps_changes)-1):
     plt.axvline(x=timestamps_changes[change], color='red')
     plt.text(timestamps_changes[change], np.nanmax(error_angles)+4, pertubations[change -1], color = 'red',rotation=0, va='top')
 
-#for change in range(0, len(timestamps_changes)-1):
-    #   plt.axhline(mv_list[change], timestamps_changes[change], timestamps_changes[change + 1], color='green', linestyle='dashed')
-
-#for i, mean_value in enumerate(mean_values):
-    #   plt.text((timestamps_changes[i] + timestamps_changes[i + 1]) / 2, mean_value + 1, f'Mean: {mean_value:.2f}', color='green', ha='center', va='bottom')
 
 for i, mean_value in enumerate(mean_values):
     plt.axhline(mean_value, color='green', linestyle='dotted', xmin=timestamps_changes_full[i] / len(att_nr), xmax=timestamps_changes_full[i + 1] / len(att_nr))
+    plt.axhline(mean_value - mov_var_list[i], color='red', linestyle='dotted', xmin=timestamps_changes_full[i] / len(att_nr), xmax=timestamps_changes_full[i + 1] / len(att_nr))
+    plt.axhline(mean_value + mov_var_list[i], color='red', linestyle='dotted', xmin=timestamps_changes_full[i] / len(att_nr), xmax=timestamps_changes_full[i + 1] / len(att_nr))
 
-
-plt.savefig('reaching_task_graph.png')
+plt.savefig('reaching_task_graph_new.png')
 plt.show()
 
 sys.exit()
-
-if 1==0:
-    print('comments')
-    '''
-    print(error_angles)
-    ## TASK 2, CALCULATE, PLOT AND SAVE ERRORS from error_angles
-    error_array = np.array(error_angles)
-
-    min_error = np.nanmin(error_array)
-    max_error = np.nanmax(error_array)
-
-    errors_unpert = error_angles[0:GRADUAL_PERT_ATT_NO]
-    errors_gradpert = error_angles[GRADUAL_PERT_ATT_NO:60]
-    errors_unpert_2 = error_angles[60:SUDDEN_PERT_ATT_NO]
-    errors_suddpert = error_angles[SUDDEN_PERT_ATT_NO:100]
-    errors_unpert_3 = error_angles[100:120]
-
-    plt.plot(error_angles, 'ro--')
-    plt.vlines(timestamps_changes, min_error, max_error)
-
-    for att in timestamps_changes:
-    plt.hlines(np.nanmean(errors_unpert), 0, GRADUAL_PERT_ATT_NO, colors='g', linestyles='dashed')
-    plt.hlines(np.nanmean(errors_gradpert), GRADUAL_PERT_ATT_NO, 60, colors='g', linestyles='dashed')
-    plt.hlines(np.nanmean(errors_unpert_2), 60, SUDDEN_PERT_ATT_NO, colors='g', linestyles='dashed')
-    plt.hlines(np.nanmean(errors_suddpert), SUDDEN_PERT_ATT_NO, 100, colors='g', linestyles='dashed')
-    plt.hlines(np.nanmean(errors_unpert_3), 100, 120, colors='g', linestyles='dashed')
-    plt.ylabel('Error angle (degrees)')
-    plt.xlabel('#Attempt')
-    plt.grid()
-    plt.show()
-    '''
-
-#comments: motor adaptation should be more robust (i.e. aftereffect should be higher) in the case of gradual pertubation
-#error during adaptation should be higher in the case of gradual perturbation, lower for sudden perturbation
-# cognitive influence higher in the sudden perturbation case --> more robust aftereffect in the gradual perturbation case
