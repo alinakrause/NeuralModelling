@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Game parameters
-SCREEN_X, SCREEN_Y = 2560,1600 # your screen resolution
+SCREEN_X, SCREEN_Y = 3024, 1964 #2560,1600 # your screen resolution
 WIDTH, HEIGHT = SCREEN_X // 1  , SCREEN_Y // 1#WIDTH, HEIGHT = SCREEN_X // 1.5  , SCREEN_Y // 1.5 # be aware of monitor scaling on windows (150%)
 CIRCLE_SIZE = 20
 TARGET_SIZE = CIRCLE_SIZE
@@ -18,7 +18,6 @@ START_ANGLE = 0
 PERTUBATION_ANGLE = 30
 MOUSE_PERTUBATION_ANGLE = 30
 TIME_LIMIT = 1000 # time limit in ms
-INTERFERENCE_ANGLE = 30
 
 #GRADUAL_PERT_ATT_NO = 10
 #SUDDEN_PERT_ATT_NO = 80
@@ -26,11 +25,7 @@ INTERFERENCE_ANGLE = 30
 timestamps_changes = [1,40,80,120,160,200,240,280,320,360]
 #timestamps_changes = [1,5,10,15,20,25,30,35,40,45]  # WHEN CHANGING THIS ALSO CHANGE FULL ARRAY
 
-#timestamps_changes_interfere = [1,20,40,60,80,100,120,140,160]
-timestamps_changes_interfere = [1,5,10,15,20,25,30,35,40]
-
 ATTEMPTS_LIMIT = timestamps_changes[len(timestamps_changes)-1]+1
-ATTEMPTS_LIMIT_INTERFERE = timestamps_changes_interfere[len(timestamps_changes_interfere)-1]+1
 timestamps_changes_full = [0,40,80,120,160,200,240,280,320,ATTEMPTS_LIMIT]
 #timestamps_changes_full = [0,5,10,15,20,25,30,35,40,ATTEMPTS_LIMIT]
 
@@ -51,26 +46,10 @@ pygame.display.set_caption("Reaching Game")
 
 
 # Initialize game metrics
-test_mode = True
 score = 0
 attempts = 0
 new_target = None
 start_time = 0
-exp_setup='interference' 
-
-pertubations = [' gradual \n perturbation', ' no \n perturbation', ' sudden \n perturbation', ' no \n perturbation', 'target \n shift', 'no \n perturbation', 'sudden \n perturbation', 'no \n perturbation']
-
-pertubations_interference = [' sudden \n perturbation', ' no \n perturbation', ' interference', ' no \n perturbation', ' sudden \n perturbation', ' no \n perturbation']
-
-if exp_setup == 'interference':
-    pertubations = pertubations_interference
-    if test_mode:
-        timestamps_changes = [1,5,10,15,20,25,30,35]
-        timestamps_changes_full = [0,5,10,15,20,25,30,35]
-    else: 
-        timestamps_changes = [1,20,40,60,80,100,120,140]
-        timestamps_changes_full = [0,20,40,60,80,100,120,140]
-    ATTEMPTS_LIMIT = timestamps_changes[len(timestamps_changes)-1]+1
 
 new_target = None
 start_target=math.radians(START_ANGLE)
@@ -164,57 +143,31 @@ while running:
                 pertubation_mode = False
             
     # Design experiment
-    if exp_setup == 'perturbation_types': 
-        if attempts == 1:
-            pertubation_mode = False
-        elif attempts == timestamps_changes[1]:
-            pertubation_mode = True
-            pertubation_type = 'gradual'
-        elif attempts == timestamps_changes[2]:
-            pertubation_mode = False
-        elif attempts == timestamps_changes[3]:
-            pertubation_mode = True
-            pertubation_type = 'sudden'
-        elif attempts == timestamps_changes[4]:
-            pertubation_mode = False
-        elif attempts == timestamps_changes[5]:
-            pertubation_mode = False
-            start_target=math.radians(-30)
-        elif attempts == timestamps_changes[6]:
-            pertubation_mode = False
-            start_target=math.radians(START_ANGLE)
-        elif attempts == timestamps_changes[7]:
-            pertubation_mode = True
-            pertubation_type = 'sudden'
-        elif attempts == timestamps_changes[8]:
-            pertubation_mode = False
-        elif attempts >= ATTEMPTS_LIMIT:
-            running = False
-
-    elif exp_setup == 'interference': 
-        start_target=math.radians(INTERFERENCE_ANGLE)
-        if attempts == 1:
-            pertubation_mode = False
-        elif attempts == timestamps_changes[1]:
-            pertubation_mode = True
-            pertubation_type = 'sudden'
-            perturbation_angle = math.radians(30)
-        elif attempts == timestamps_changes[2]:
-            pertubation_mode = False
-        elif attempts == timestamps_changes[3]:
-            pertubation_mode = True
-            pertubation_type = 'sudden'
-            perturbation_angle = math.radians(-50)
-        elif attempts == timestamps_changes[4]:
-            pertubation_mode = False
-        elif attempts == timestamps_changes[5]:
-            pertubation_mode = True
-            pertubation_type = 'sudden'
-            perturbation_angle = math.radians(30)
-        elif attempts == timestamps_changes[6]:
-            pertubation_mode = False
-        elif attempts >= ATTEMPTS_LIMIT:
-            running = False
+    if attempts == 1:
+        pertubation_mode = False
+    elif attempts == timestamps_changes[1]:
+       pertubation_mode = True
+       pertubation_type = 'gradual'
+    elif attempts == timestamps_changes[2]:
+        pertubation_mode = False
+    elif attempts == timestamps_changes[3]:
+        pertubation_mode = True
+        pertubation_type = 'sudden'
+    elif attempts == timestamps_changes[4]:
+        pertubation_mode = False
+    elif attempts == timestamps_changes[5]:
+        pertubation_mode = False
+        start_target=math.radians(-30)
+    elif attempts == timestamps_changes[6]:
+        pertubation_mode = False
+        start_target=math.radians(START_ANGLE)
+    elif attempts == timestamps_changes[7]:
+        pertubation_mode = True
+        pertubation_type = 'sudden'
+    elif attempts == timestamps_changes[8]:
+        pertubation_mode = False
+    elif attempts >= ATTEMPTS_LIMIT:
+        running = False
 
     # Hide the mouse cursor
     pygame.mouse.set_visible(False)
@@ -337,7 +290,9 @@ while running:
 # Quit Pygame
 pygame.quit()
 
+pertubations = [' gradual \n perturbation', ' no \n perturbation', ' sudden \n perturbation', ' no \n perturbation', 'target \n shift', 'no \n perturbation', 'sudden \n perturbation', 'no \n perturbation']
 print(error_angles)
+np.savetxt("task1.csv",error_angles,delimiter =", ")
 
 ## TASK 2, CALCULATE, PLOT AND SAVE ERRORS from error_angles
 error_angles = np.array(error_angles)
