@@ -85,12 +85,12 @@ def calculate_angle(centerX, centerY, targetX, targetY, pointX, pointY):
 
 
     # anglge
-    angle = math.acos(product_CP_CT/(l_CP*l_CT))
+    angle_rad = math.acos(product_CP_CT/(l_CP*l_CT))
 
     angle2 = math.asin(product_CP_CT/(l_CP*l_CT))
     
     # in deg
-    angle_deg = math.degrees(angle)
+    angle_deg = math.degrees(angle_rad)
 
     # rotation direction
     cross_product = v_CT[0]*v_CP[1] - v_CT[1]*v_CP[0]
@@ -152,8 +152,8 @@ while running:
     if attempts == 1:
         pertubation_mode = False
     elif attempts == timestamps_changes[1]:
-       pertubation_mode = True
-       pertubation_type = 'gradual' 
+        pertubation_mode = True
+        pertubation_type = 'gradual' 
     elif attempts == timestamps_changes[2]:
         pertubation_mode = False
     elif attempts == timestamps_changes[3]:
@@ -169,7 +169,9 @@ while running:
         start_target=math.radians(START_ANGLE)
     elif attempts == timestamps_changes[7]:
         perturbation_mode = True
+        perturbation_mode = True
         perturbation_type = 'sudden'
+        start_target=math.radians(START_ANGLE)
     elif attempts == timestamps_changes[8]:
         perturbation_mode = False
     elif attempts >= ATTEMPTS_LIMIT:
@@ -186,11 +188,14 @@ while running:
     distance = math.hypot(deltax, deltay)
     
     pert_angle = 0
-
+    circle_pos = pygame.mouse.get_pos()
     if pertubation_mode:
+        print('pert',attempts)
         # TASK1: CALCULATE perturbed_mouse_pos 
         if pertubation_type=='sudden':
-            pert_angle = perturbation_angle
+            print('here',attempts)
+            pert_angle =perturbation_angle
+            print(pert_angle)
             
         elif pertubation_type=='gradual':
             k = (attempts - timestamps_changes[1]) // 5 + 1
@@ -204,11 +209,14 @@ while running:
             np.cos(pert_angle)*deltax - np.sin(pert_angle)*deltay + START_POSITION[0],
             np.sin(pert_angle)*deltax + np.cos(pert_angle)*deltay + START_POSITION[1]
         ]
+        print(perturbed_mouse_pos == pygame.mouse.get_pos())
             
         circle_pos = perturbed_mouse_pos
+
     
-    else:
-        circle_pos = pygame.mouse.get_pos()
+    #else:
+        
+    print(circle_pos == pygame.mouse.get_pos())
     
     # Check if target is hit or missed
     # hit if circle touches target's center
