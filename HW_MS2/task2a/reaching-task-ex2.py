@@ -338,7 +338,8 @@ while running:
 pygame.quit()
 
 print(error_angles)
-np.savetxt("task2B1.csv",error_angles,delimiter =", ")
+if not test_mode:
+    np.savetxt("task2B1.csv",error_angles,delimiter =", ")
 
 ## TASK 2, CALCULATE, PLOT AND SAVE ERRORS from error_angles
 error_angles = np.array(error_angles)

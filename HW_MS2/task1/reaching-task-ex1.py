@@ -29,7 +29,7 @@ ATTEMPTS_LIMIT = timestamps_changes[len(timestamps_changes)-1]+1
 timestamps_changes_full = [0,40,80,120,160,200,240,280,320,ATTEMPTS_LIMIT]
 #timestamps_changes_full = [0,5,10,15,20,25,30,35,40,ATTEMPTS_LIMIT]
 
-
+test_mode = False
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -292,7 +292,8 @@ pygame.quit()
 
 pertubations = [' gradual \n perturbation', ' no \n perturbation', ' sudden \n perturbation', ' no \n perturbation', 'target \n shift', 'no \n perturbation', 'sudden \n perturbation', 'no \n perturbation']
 print(error_angles)
-np.savetxt("task1.csv",error_angles,delimiter =", ")
+if not test_mode:
+    np.savetxt("task1.csv",error_angles,delimiter =", ")
 
 ## TASK 2, CALCULATE, PLOT AND SAVE ERRORS from error_angles
 error_angles = np.array(error_angles)
