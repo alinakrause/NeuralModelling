@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Game parameters
-SCREEN_X, SCREEN_Y = 3024, 1964 #2560,1600 # your screen resolution
+SCREEN_X, SCREEN_Y = 2560,1600 # your screen resolution
 WIDTH, HEIGHT = SCREEN_X // 1  , SCREEN_Y // 1#WIDTH, HEIGHT = SCREEN_X // 1.5  , SCREEN_Y // 1.5 # be aware of monitor scaling on windows (150%)
 CIRCLE_SIZE = 20
 TARGET_SIZE = CIRCLE_SIZE
@@ -22,12 +22,27 @@ TIME_LIMIT = 1000 # time limit in ms
 #GRADUAL_PERT_ATT_NO = 10
 #SUDDEN_PERT_ATT_NO = 80
 
+mode = 'hw2' # hw1
+
 timestamps_changes = [1,40,80,120,160,200,240,280,320,360]
 #timestamps_changes = [1,5,10,15,20,25,30,35,40,45]  # WHEN CHANGING THIS ALSO CHANGE FULL ARRAY
 
-ATTEMPTS_LIMIT = timestamps_changes[len(timestamps_changes)-1]+1
+ATTEMPTS_LIMIT = timestamps_changes[len(timestamps_changes)-1]
 timestamps_changes_full = [0,40,80,120,160,200,240,280,320,ATTEMPTS_LIMIT]
 #timestamps_changes_full = [0,5,10,15,20,25,30,35,40,ATTEMPTS_LIMIT]
+
+
+pertubations = [' gradual \n perturbation', ' no \n perturbation', ' sudden \n perturbation', ' no \n perturbation', 'target \n shift', 'no \n perturbation', 'sudden \n perturbation', 'no \n perturbation']
+
+if mode == 'hw2':
+    #timestamps_changes = [1,40,80,120,160,200]
+    timestamps_changes = [1,5,10,15,20,25]  # WHEN CHANGING THIS ALSO CHANGE FULL ARRAY
+
+    ATTEMPTS_LIMIT = timestamps_changes[len(timestamps_changes)-1]
+    #timestamps_changes_full = [0,40,80,120,160,ATTEMPTS_LIMIT]
+    timestamps_changes_full = [0,5,10,15,20,ATTEMPTS_LIMIT]
+    
+    pertubations = [' sudden \n perturbation', ' no \n perturbation', ' sudden \n perturbation', ' no \n perturbation']
 
 test_mode = False
 # Colors
@@ -141,33 +156,48 @@ while running:
                 pertubation_mode = True
             elif event.key == pygame.K_5: # Press '5' to end pertubation_mode
                 pertubation_mode = False
-            
+    if mode == 'hw1':     
     # Design experiment
-    if attempts == 1:
-        pertubation_mode = False
-    elif attempts == timestamps_changes[1]:
-       pertubation_mode = True
-       pertubation_type = 'gradual'
-    elif attempts == timestamps_changes[2]:
-        pertubation_mode = False
-    elif attempts == timestamps_changes[3]:
-        pertubation_mode = True
-        pertubation_type = 'sudden'
-    elif attempts == timestamps_changes[4]:
-        pertubation_mode = False
-    elif attempts == timestamps_changes[5]:
-        pertubation_mode = False
-        start_target=math.radians(-30)
-    elif attempts == timestamps_changes[6]:
-        pertubation_mode = False
-        start_target=math.radians(START_ANGLE)
-    elif attempts == timestamps_changes[7]:
-        pertubation_mode = True
-        pertubation_type = 'sudden'
-    elif attempts == timestamps_changes[8]:
-        pertubation_mode = False
-    elif attempts >= ATTEMPTS_LIMIT:
-        running = False
+        if attempts == 1:
+            pertubation_mode = False
+        elif attempts == timestamps_changes[1]:
+            pertubation_mode = True
+            pertubation_type = 'gradual'
+        elif attempts == timestamps_changes[2]:
+            pertubation_mode = False
+        elif attempts == timestamps_changes[3]:
+            pertubation_mode = True
+            pertubation_type = 'sudden'
+        elif attempts == timestamps_changes[4]:
+            pertubation_mode = False
+        elif attempts == timestamps_changes[5]:
+            pertubation_mode = False
+            start_target=math.radians(-30)
+        elif attempts == timestamps_changes[6]:
+            pertubation_mode = False
+            start_target=math.radians(START_ANGLE)
+        elif attempts == timestamps_changes[7]:
+            pertubation_mode = True
+            pertubation_type = 'sudden'
+        elif attempts == timestamps_changes[8]:
+            pertubation_mode = False
+        elif attempts >= ATTEMPTS_LIMIT:
+            running = False
+    elif mode == 'hw2':
+        if attempts == 1:
+            pertubation_mode = False
+        elif attempts == timestamps_changes[1]:
+            pertubation_mode = True
+            pertubation_type = 'sudden'
+        elif attempts == timestamps_changes[2]:
+            pertubation_mode = False
+        elif attempts == timestamps_changes[3]:
+            pertubation_mode = True
+            pertubation_type = 'sudden'
+        elif attempts == timestamps_changes[4]:
+            pertubation_mode = False
+        elif attempts >= ATTEMPTS_LIMIT:
+            running = False
 
     # Hide the mouse cursor
     pygame.mouse.set_visible(False)
@@ -290,7 +320,6 @@ while running:
 # Quit Pygame
 pygame.quit()
 
-pertubations = [' gradual \n perturbation', ' no \n perturbation', ' sudden \n perturbation', ' no \n perturbation', 'target \n shift', 'no \n perturbation', 'sudden \n perturbation', 'no \n perturbation']
 print(error_angles)
 if not test_mode:
     np.savetxt("task1.csv",error_angles,delimiter =", ")
